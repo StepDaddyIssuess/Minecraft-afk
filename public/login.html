@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-color: #0a0a0a;
+    --panel-color: #111;
+    --neon-blue: #00f0ff;
+    --neon-pink: #ff00ff;
+    --neon-green: #00ff99;
+    --text-color: #e0e0e0;
+    --scrollbar-bg: #222;
+    --scrollbar-thumb: #00f0ff;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+#loginBox {
+    background: var(--panel-color);
+    padding: 30px 40px;
+    border-radius: 12px;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue);
+    text-align: center;
+    width: 360px;
+}
+
+#loginBox h2 {
+    margin-bottom: 20px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 10px 0;
+    border: 1px solid var(--neon-blue);
+    border-radius: 6px;
+    background: #111;
+    color: var(--text-color);
+    outline: none;
+    transition: 0.2s;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+input:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+button {
+    width: 100%;
+    padding: 10px 0;
+    margin-top: 10px;
+    border: 1px solid var(--neon-blue);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-color);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+
+button:hover {
+    color: var(--neon-pink);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+}
+
+#error {
+    color: #ff5555;
+    margin-top: 10px;
+    font-size: 14px;
+    text-shadow: 0 0 3px #000;
+    min-height: 20px;
+}
+
+/* Scrollbar */
+#loginBox::-webkit-scrollbar {
+    width: 6px;
+}
+
+#loginBox::-webkit-scrollbar-track {
+    background: var(--scrollbar-bg);
+}
+
+#loginBox::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+</style>
+</head>
+<body>
+<div id="loginBox">
+    <h2>Dashboard Login</h2>
+    <form id="loginForm">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p id="error"></p>
+</div>
+
+<script>
+const form = document.getElementById('loginForm');
+form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const res = await fetch('/login', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+    });
+    const data = await res.json();
+    if(data.success){
+        localStorage.setItem('loggedIn', 'true');
+        window.location.href = 'index.html';
+    } else {
+        document.getElementById('error').textContent = 'Invalid username or password';
+    }
+});
+</script>
+</body>
+</html>
