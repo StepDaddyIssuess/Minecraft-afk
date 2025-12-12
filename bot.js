@@ -133,7 +133,10 @@ function mcColorToHTML(message) {
 // Start server
 // -------------------------
 server.listen(3000, '0.0.0.0', () => console.log("Dashboard running at port 3000"));
-
+setInterval(() => {
+    // SELF PING using Fly internal IPv6 DNS (prevents autostop)
+    fetch("http://app.internal").catch(() => {});
+}, 60 * 1000);
 // -------------------------
 // Create bot
 // -------------------------
