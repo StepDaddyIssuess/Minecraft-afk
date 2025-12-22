@@ -1,8 +1,6 @@
-const URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000' 
-    : 'https://minecraft-afk.fly.dev/';
 
-const socket = io(URL, { transports: ["websocket"] });
+
+const socket = io('https://minecraft-afk.fly.dev/', { transports: ["websocket"] });
 
 // Elements
 const startBotBtn = document.getElementById('startBotBtn');
