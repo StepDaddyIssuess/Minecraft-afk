@@ -160,3 +160,69 @@ select {
     background: var(--scrollbar-thumb);
     border-radius: 4px;
 }
+
+#chatOutput {
+    white-space: pre-wrap; /* preserve spaces and line breaks */
+    color: inherit;         /* allow inline span colors to apply */
+    font-family: 'Share Tech Mono', monospace;
+}
+
+#chatOutput div {
+    margin-bottom: 4px;
+}
+
+#chatOutput div span {
+    display: inline;
+    color: inherit; /* this ensures the inline style from mcColorToHTML works */
+    text-shadow: 0 0 5px #000; /* keep your neon effect */
+}
+
+.bot-container { margin-bottom: 10px; }
+
+/* Dropdown main button */
+.dropbtn {
+    background: #111;
+    color: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 0 5px var(--neon-blue);
+    transition: 0.2s;
+}
+.dropbtn:hover {
+    color: var(--neon-pink);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+}
+
+/* Dropdown container */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #111;
+    min-width: 160px;
+    border: 1px solid var(--neon-blue);
+    z-index: 10;
+    flex-direction: column;
+}
+.dropdown-content button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    padding: 8px 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: none;
+}
+.dropdown-content button:hover {
+    background-color: #222;
+    color: var(--neon-pink);
+}
+
+/* Show dropdown */
+.dropdown.show .dropdown-content { display: flex; flex-direction: column; }

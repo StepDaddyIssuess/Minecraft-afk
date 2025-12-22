@@ -4,7 +4,7 @@
   "description": "Mineflayer AFK bots with dashboard + Microsoft login",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "nodemon src/server.js"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
@@ -12,6 +12,7 @@
     "express-session": "^1.18.2",
     "fs-extra": "^11.1.1",
     "mineflayer": "^4.32.0",
+    "nodemon": "^3.1.11",
     "open": "^10.2.0",
     "socket.io": "^4.8.1"
   },

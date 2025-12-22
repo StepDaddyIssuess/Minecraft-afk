@@ -1,5 +1,4 @@
-const socket = io("https://minecraft-afk.fly.dev", { transports: ["websocket"] });
-
+const socket = io('http://localhost:3000', { transports: ["websocket"] });
 
 // Elements
 const startBotBtn = document.getElementById('startBotBtn');
@@ -13,12 +12,11 @@ const sendChatBtn = document.getElementById('sendChatBtn');
 const botSelect = document.getElementById('botSelect');
 const accountsListDiv = document.getElementById('accountsList');
 const runningBotsDiv = document.getElementById('runningBotsDiv');
-
 const loginModal = document.getElementById('loginModal');
 const loginMessage = document.getElementById('loginMessage');
 const overlay = document.getElementById('overlay');
 
-// Start bot
+// -------------------- START BOT --------------------
 startBotBtn.addEventListener('click', () => {
     const host = hostInput.value;
     const port = portInput.value || 25565;
@@ -26,53 +24,40 @@ startBotBtn.addEventListener('click', () => {
     socket.emit('startBot', { host, port, username });
 });
 
-// Display logs
+// -------------------- LOGS --------------------
 socket.on('log', msg => {
     logOutput.textContent += msg + '\n';
     logOutput.scrollTop = logOutput.scrollHeight;
 });
 
-// Display chat with colors
+// -------------------- CHAT --------------------
 socket.on('chat', ({ bot, from, message, time }) => {
-    if (!message || message.trim() === '') return;
-
+    if (!message || !message.trim()) return;
     const msgEl = document.createElement('div');
     const displayTime = time || new Date().toLocaleTimeString();
-
-    // Use innerHTML so colored HTML from server renders
     msgEl.innerHTML = `<span style="color:gray">[${bot}] [${displayTime}]</span> <b>${from}:</b> ${message}`;
     chatOutput.appendChild(msgEl);
     chatOutput.scrollTop = chatOutput.scrollHeight;
 });
 
-// Display heartbeat (bot still online)
+// -------------------- HEARTBEAT --------------------
 socket.on('heartbeat', ({ bot, message, time }) => {
     const msgEl = document.createElement('div');
-    const displayTime = time || new Date().toLocaleTimeString();
-    msgEl.textContent = `[${bot}] [${displayTime}] 🔹 ${message}`;
+    msgEl.textContent = `[${bot}] [${time}] 🔹 ${message}`;
     logOutput.appendChild(msgEl);
     logOutput.scrollTop = logOutput.scrollHeight;
 });
 
-// Show Microsoft login popup
-socket.on('loginPopup', ({ username, url, code }) => {
+// -------------------- MICROSOFT LOGIN --------------------
+socket.on('loginPopup', ({ url, code }) => {
     loginMessage.innerHTML = `<a href="${url}" target="_blank">${url}</a><br>Code: ${code}`;
     loginModal.style.display = 'block';
     overlay.style.display = 'block';
 });
+function copyCode() { navigator.clipboard.writeText(loginMessage.textContent); }
+function closeModal() { loginModal.style.display = 'none'; overlay.style.display = 'none'; }
 
-// Copy code
-function copyCode() {
-    navigator.clipboard.writeText(loginMessage.textContent).then(() => alert('Copied!'));
-}
-
-// Close modal
-function closeModal() {
-    loginModal.style.display = 'none';
-    overlay.style.display = 'none';
-}
-
-// Send chat
+// -------------------- SEND CHAT --------------------
 sendChatBtn.addEventListener('click', () => {
     const botName = botSelect.value;
     const msg = chatInput.value.trim();
@@ -80,13 +65,9 @@ sendChatBtn.addEventListener('click', () => {
     socket.emit('sendChat', { bot: botName, message: msg });
     chatInput.value = '';
 });
+chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendChatBtn.click(); });
 
-// Enter key for chat
-chatInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendChatBtn.click();
-});
-
-// Update accounts list dynamically
+// -------------------- ACCOUNTS LIST --------------------
 function updateAccountsList(accounts) {
     accountsListDiv.innerHTML = '';
     accounts.forEach(acc => {
@@ -94,29 +75,57 @@ function updateAccountsList(accounts) {
         btn.textContent = acc.username || acc;
         btn.className = 'account-btn';
         btn.onclick = () => {
-            const host = prompt(`Enter server IP for "${acc.username || acc}":`, 'localhost');
-            const port = prompt(`Enter server port for "${acc.username || acc}":`, '25565');
-            socket.emit('startBot', { username: acc.username || acc, host, port });
+            socket.emit('startBot', { username: acc.username || acc, host: 'play.fruitville.org', port: 25565 });
         };
         accountsListDiv.appendChild(btn);
     });
 }
+socket.on('accountsList', updateAccountsList);
 
-// Update running bots list
+// -------------------- RUNNING BOTS WITH DROPDOWN --------------------
 socket.on('runningBots', bots => {
     runningBotsDiv.innerHTML = '';
     botSelect.innerHTML = '';
     chatOutput.innerHTML = '';
-    bots.forEach(username => {
-        const btn = document.createElement('button');
-        btn.textContent = `Stop ${username}`;
-        btn.className = 'account-btn';
-        btn.onclick = () => {
-            socket.emit('stopBot', username);
-            chatOutput.innerHTML = '';
-        };
-        runningBotsDiv.appendChild(btn);
 
+    bots.forEach(username => {
+        const container = document.createElement('div');
+        container.className = 'bot-container';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown';
+
+        // Main bot button
+        const dropBtn = document.createElement('button');
+        dropBtn.className = 'dropbtn';
+        dropBtn.textContent = username;
+
+        // Dropdown menu
+        const dropdownContent = document.createElement('div');
+        dropdownContent.className = 'dropdown-content';
+
+        const stopBtn = document.createElement('button');
+        stopBtn.textContent = 'Stop Bot';
+        stopBtn.onclick = () => socket.emit('stopBot', username);
+
+        const balanceBtn = document.createElement('button');
+        balanceBtn.textContent = 'Check Balance';
+        balanceBtn.onclick = () => socket.emit('runBalance', username);
+
+        const sellBtn = document.createElement('button');
+        sellBtn.textContent = 'Sell Collectors';
+        sellBtn.onclick = () => socket.emit('runSell', username);
+
+        dropdownContent.appendChild(stopBtn);
+        dropdownContent.appendChild(balanceBtn);
+        dropdownContent.appendChild(sellBtn);
+
+        dropdown.appendChild(dropBtn);
+        dropdown.appendChild(dropdownContent);
+        container.appendChild(dropdown);
+        runningBotsDiv.appendChild(container);
+
+        // Add to chat dropdown
         const option = document.createElement('option');
         option.value = username;
         option.textContent = username;
@@ -124,5 +133,10 @@ socket.on('runningBots', bots => {
     });
 });
 
-// Listen for accounts list
-socket.on('accountsList', updateAccountsList);
+// Toggle dropdowns
+document.addEventListener('click', e => {
+    document.querySelectorAll('.dropdown').forEach(drop => {
+        if(drop.contains(e.target)) drop.classList.toggle('show');
+        else drop.classList.remove('show');
+    });
+});
