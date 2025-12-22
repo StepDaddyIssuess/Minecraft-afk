@@ -97,12 +97,17 @@ async function createBot({ host = 'localhost', port = 25565, username, io }) {
     io.emit('log', `Starting bot for ${username}`);
 
     const bot = mineflayer.createBot({
-        host,
-        port: Number(port),
-        username,
-        auth: 'microsoft',
-        version: '1.19'
-    });
+    host,
+    port: Number(port),
+    username,
+    auth: 'microsoft',
+    version: '1.19',
+    onMsaCode: (codeData) => {
+        const url = codeData.verification_uri || codeData.verificationUri;
+        const code = codeData.user_code || codeData.userCode;
+        io.emit("loginPopup", { username, url, code });
+    }
+});
 
     bot.once('login', () => {
         io.emit('log', `Bot ${username} logged in successfully`);
