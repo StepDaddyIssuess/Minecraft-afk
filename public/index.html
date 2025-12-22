@@ -9,7 +9,11 @@
             window.location.href = '/login.html';
         }
     </script>
-    <!-- Correct CSS path -->
+
+    <!-- Socket.IO client from CDN -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-RXAlx+qM3wLdZVwN0ck+uO6cH+3hzlVqv8fz3VZ4mQX0K/lrHgk6qVceU3BklzB1" crossorigin="anonymous"></script>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,9 +58,7 @@
         <button onclick="closeModal()">Close</button>
     </div>
 
-    <!-- Correct JS path -->
-    <script src="/socket.io/socket.io.js"></script>
-<script src="/public/script.js"></script>
-
+    <!-- Your main JS -->
+    <script src="/public/script.js"></script>
 </body>
 </html>
