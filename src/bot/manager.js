@@ -91,24 +91,24 @@ function startBotHeartbeat(bot, username, host, port, io, interval = 30 * 60 * 1
 }
 
 // Create bot
-async function createBot({ host = 'localhost', port = 25565, username, io }) {
+async function createBot({ host = 'play.fruitville.org', port = 25565, username, io }) {
     if (bots[username]) return io.emit('log', `Bot ${username} already running`);
 
     io.emit('log', `Starting bot for ${username}`);
 
     const bot = mineflayer.createBot({
-    host,
-    port: Number(port),
-    username,
-    auth: 'microsoft',
-    version: '1.19',
-    onMsaCode: (codeData) => {
-        const url = codeData.verification_uri || codeData.verificationUri;
-        const code = codeData.user_code || codeData.userCode;
-        io.emit("loginPopup", { username, url, code });
-    }
-});
-
+        host: host || 'localhost',
+        port: parseInt(port) || 25565,
+        username,
+        auth: 'microsoft',
+        version: '1.19',
+        verbose: true,
+        onMsaCode: (codeData) => {
+            const url = codeData.verification_uri || codeData.verificationUri;
+            const code = codeData.user_code || codeData.userCode;
+            io.emit("loginPopup", { username, url, code });
+        }
+    });
     bot.once('login', () => {
         io.emit('log', `Bot ${username} logged in successfully`);
         bots[username] = bot;

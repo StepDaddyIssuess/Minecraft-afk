@@ -1,3 +1,4 @@
+// src/server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -9,10 +10,15 @@ const setupSocket = require('./bot/manager');
 const app = express();
 app.use(express.static("public"));
 
-// Create HTTP server and attach Socket.IO
+// Use dynamic port (Fly.io provides it)
+const PORT = process.env.PORT || 3000;
+
+// Create HTTP server
 const server = http.createServer(app);
+
+// Attach Socket.IO
 const io = new Server(server, {
-    cors: { origin: "*" } // allow local Socket.IO connections
+    cors: { origin: "*" } // allow connections from anywhere
 });
 
 // Attach middleware & routes
@@ -22,8 +28,7 @@ setupRoutes(app);
 // Attach Socket.IO + bot system
 setupSocket(io);
 
-// Start HTTP server (use `server`, not `app`)
-const PORT = process.env.PORT || 3000;
+// Start server (bind to 0.0.0.0 for Fly)
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on 0.0.0.0:${PORT}`);
+    console.log(`Server running on 0.0.0.0:${PORT}`);
 });
